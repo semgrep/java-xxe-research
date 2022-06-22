@@ -30,6 +30,11 @@ public class Tests {
             testDisallowDoctypeDecl();
             testExternalGeneralEntities();
             testExternalParameterEntities();
+            testSetValidating();
+            testSetExpandEntities();
+            testSetXIncludeAware();
+            testXInclude();
+            testLoadExternalDTD();
         } catch (ParserConfigurationException e) {
             System.out.println(e.getMessage());
             // do nothing
@@ -86,6 +91,46 @@ public class Tests {
         parseAllThree(dBuilder);
     }
 
+    public static void testSetValidating() throws ParserConfigurationException {
+        System.out.println("setValidating(false)");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        dbFactory.setValidating(false);
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        parseAllThree(dBuilder);
+    }
+
+    public static void testSetExpandEntities() throws ParserConfigurationException {
+        System.out.println("setExpandEntityReferences(false)");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        dbFactory.setExpandEntityReferences(false);
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        parseAllThree(dBuilder);
+    }
+
+    public static void testSetXIncludeAware() throws ParserConfigurationException {
+        System.out.println("setXIncludeAware(false)");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        dbFactory.setXIncludeAware(false);
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        parseAllThree(dBuilder);
+    }
+
+    public static void testXInclude() throws ParserConfigurationException {
+        System.out.println("setFeature(\"http://apache.org/xml/features/xinclude\", false)");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        dbFactory.setFeature("http://apache.org/xml/features/xinclude", false);
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        parseAllThree(dBuilder);
+    }
+
+    public static void testLoadExternalDTD() throws ParserConfigurationException {
+        System.out.println("setFeature(\"http://apache.org/xml/features/nonvalidating/load-external-dtd\", false)");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        parseAllThree(dBuilder);
+    }
+
 
 
     /*
@@ -102,6 +147,7 @@ public class Tests {
         try {
             File input = new File("payloads/input-dos/xml-bomb.xml");
             dBuilder.parse(input);
+            System.out.println("    Parse XML Bomb: Secure");
         } catch (Exception e) {
             if (e.getMessage().equals("JAXP00010001: The parser has encountered more than \"64000\" entity expansions in this document; this is the limit imposed by the JDK.")){
                 System.out.println("    Parse XML Bomb: Secure");
