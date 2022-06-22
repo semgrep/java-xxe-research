@@ -24,6 +24,8 @@ public class Tests {
 
         try {
             testDefaultConfig();
+            testSetFeatureSecreProcessing();
+
             testAccessExternalDTD();
             testAccessExternalSchema();
             // access external stylesheet is not applicable to DocumentBuilderFactory
@@ -48,7 +50,14 @@ public class Tests {
         parseAllThree(dBuilder);
     }
 
-    // This is secure!
+    public static void testSetFeatureSecreProcessing() throws ParserConfigurationException {
+        System.out.println("setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        dbFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        parseAllThree(dBuilder);
+    }
+
     public static void testAccessExternalDTD() throws ParserConfigurationException {
         System.out.println("setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, \"\")");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
