@@ -12,61 +12,52 @@ import java.io.File;
 public class Tests {
 
 
-    public static void main(String [] args){
+    public static void main(String [] args) throws ParserConfigurationException {
         testDefaultConfig();
         testAccessExternalDTD();
         testAccessExternalSchema();
         // access external stylesheet is not applicable to DocumentBuilderFactory
     }
 
-    public static void testDefaultConfig(){
-        try {
-            System.out.println("Default Config");
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-
-            parseXmlBomb(dBuilder);
-            parseInputWithSchema(dBuilder);
-            parseInputWithStylesheet(dBuilder);
-
-        } catch (ParserConfigurationException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+    public static void testDefaultConfig() throws ParserConfigurationException {
+        System.out.println("Default Config");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        parseAllThree(dBuilder);
     }
 
     // This is secure!
-    public static void testAccessExternalDTD(){
-        try {
-            System.out.println("Access External DTD");
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    public static void testAccessExternalDTD() throws ParserConfigurationException {
+        System.out.println("Access External DTD");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-
-            parseXmlBomb(dBuilder);
-            parseInputWithSchema(dBuilder);
-            parseInputWithStylesheet(dBuilder);
-
-        } catch (ParserConfigurationException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        parseAllThree(dBuilder);
     }
 
-    public static void testAccessExternalSchema(){
-        try {
-            System.out.println("Access External Schema");
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+    public static void testAccessExternalSchema() throws ParserConfigurationException {
+        System.out.println("Access External Schema");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        parseAllThree(dBuilder);
 
-            parseXmlBomb(dBuilder);
-            parseInputWithSchema(dBuilder);
-            parseInputWithStylesheet(dBuilder);
+    }
 
-        } catch (ParserConfigurationException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
+
+
+
+
+    /*
+        Parse the test files
+     */
+
+    public static void parseAllThree(DocumentBuilder db){
+        parseXmlBomb(db);
+        parseInputWithSchema(db);
+        parseInputWithStylesheet(db);
     }
 
     public static void parseXmlBomb(DocumentBuilder dBuilder){
