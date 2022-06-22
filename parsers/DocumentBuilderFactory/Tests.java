@@ -1,6 +1,4 @@
-package DocumentBuilderFactory;
-
-import org.xml.sax.SAXException;
+package parsers.DocumentBuilderFactory;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -23,6 +21,7 @@ public class Tests {
 
 
         try {
+            System.out.println("TESTING DocumentBuilderFactory configurations");
             testDefaultConfig();
             testSetFeatureSecreProcessing();
 
@@ -47,7 +46,7 @@ public class Tests {
         System.out.println("Default Config");
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testSetFeatureSecreProcessing() throws ParserConfigurationException {
@@ -55,7 +54,7 @@ public class Tests {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testAccessExternalDTD() throws ParserConfigurationException {
@@ -64,7 +63,7 @@ public class Tests {
         dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testAccessExternalSchema() throws ParserConfigurationException {
@@ -73,7 +72,7 @@ public class Tests {
         dbFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testDisallowDoctypeDecl() throws ParserConfigurationException {
@@ -81,7 +80,7 @@ public class Tests {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testExternalGeneralEntities() throws ParserConfigurationException {
@@ -89,7 +88,7 @@ public class Tests {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testExternalParameterEntities() throws ParserConfigurationException {
@@ -97,7 +96,7 @@ public class Tests {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testSetValidating() throws ParserConfigurationException {
@@ -105,7 +104,7 @@ public class Tests {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setValidating(false);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testSetExpandEntities() throws ParserConfigurationException {
@@ -113,7 +112,7 @@ public class Tests {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setExpandEntityReferences(false);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testSetXIncludeAware() throws ParserConfigurationException {
@@ -121,7 +120,7 @@ public class Tests {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setXIncludeAware(false);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testXInclude() throws ParserConfigurationException {
@@ -129,7 +128,7 @@ public class Tests {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setFeature("http://apache.org/xml/features/xinclude", false);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
     public static void testLoadExternalDTD() throws ParserConfigurationException {
@@ -137,7 +136,7 @@ public class Tests {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        parseAllThree(dBuilder);
+        parseAll(dBuilder);
     }
 
 
@@ -146,10 +145,11 @@ public class Tests {
         Parse the test files
      */
 
-    public static void parseAllThree(DocumentBuilder db){
+    public static void parseAll(DocumentBuilder db){
         parseXmlBomb(db);
         parseInputWithSchema(db);
         parseInputWithStylesheet(db);
+        parseInputWithParameterEntity(db);
     }
 
     public static void parseXmlBomb(DocumentBuilder dBuilder){
@@ -195,6 +195,25 @@ public class Tests {
             dBuilder.parse(input);
             System.out.println("Secure");
         } catch (Exception e) {
+            if(e.getMessage().contains("Connection refused")){
+                System.out.println("Insecure");
+            } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")){
+                System.out.println("Secure");
+            } else if(e.getMessage().contains("DOCTYPE is disallowed")){
+                System.out.println("Secure");
+            }
+            else {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+    public static void parseInputWithParameterEntity(DocumentBuilder dBuilder){
+        try {
+            System.out.print("    Parse Xml Input With Parameter Entity: ");
+            File input = new File("payloads/input-with-parameter-entity/input.xml");
+            dBuilder.parse(input);
+            System.out.println("Secure");
+        } catch (Exception e){
             if(e.getMessage().contains("Connection refused")){
                 System.out.println("Insecure");
             } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")){
