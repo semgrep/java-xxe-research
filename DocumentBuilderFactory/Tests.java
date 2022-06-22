@@ -159,8 +159,11 @@ public class Tests {
             System.out.println("    Parse XML Bomb: Secure");
         } catch (Exception e) {
             if (e.getMessage().equals("JAXP00010001: The parser has encountered more than \"64000\" entity expansions in this document; this is the limit imposed by the JDK.")){
+                System.out.println("    Parse XML Bomb: Insecure");
+            } else if(e.getMessage().contains("DOCTYPE is disallowed")){
                 System.out.println("    Parse XML Bomb: Secure");
             }else{
+                System.out.println(e.getMessage());
                 System.out.println("    Parse XML Bomb: Insecure");
             }
         }
@@ -179,6 +182,8 @@ public class Tests {
                 System.out.println("Secure");
             } else if(e.getMessage().contains("DOCTYPE is disallowed")){
                 System.out.println("Secure");
+            }else{
+                System.out.println(e.getMessage());
             }
         }
     }
@@ -197,8 +202,9 @@ public class Tests {
             } else if(e.getMessage().contains("DOCTYPE is disallowed")){
                 System.out.println("Secure");
             }
+            else {
+                System.out.println(e.getMessage());
+            }
         }
     }
-
-
 }
