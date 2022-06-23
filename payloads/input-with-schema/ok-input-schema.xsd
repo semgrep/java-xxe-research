@@ -1,0 +1,33 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="matricula">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="aluno" maxOccurs="1" minOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="nome"/>
+              <xs:element type="xs:string" name="nascimento"/>
+              <xs:element type="xs:int" name="numeroMatricula"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="cadeiras">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="cadeira" maxOccurs="unbounded" minOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="nome"/>
+                    <xs:element type="xs:string" name="horario"/>
+                    <xs:element type="xs:byte" name="creditos"/>
+                    <xs:element type="xs:string" name="professor"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
