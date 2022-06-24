@@ -24,6 +24,17 @@ public class Tests {
       System.out.println("TESTING TransformerFactory configurations");
       testDefaultConfig();
       testSetFeatureSecreProcessing();
+      testAccessExternalDTD();
+      testAccessExternalSchema();
+      testAccessExternalStylesheet();
+      testDisallowDoctypeDecl();
+      testExternalGeneralEntities();
+      testExternalParameterEntities();
+      testSetValidating();
+      testSetExpandEntities();
+      testSetXIncludeAware();
+      testXInclude();
+      testLoadExternalDTD();
     } catch (Exception e) {
         System.out.println(e.getMessage());
         // do nothing
@@ -43,7 +54,93 @@ public class Tests {
     parseAll(tf);
   }
 
+  public static void testAccessExternalDTD() throws TransformerConfigurationException {
+    System.out.println("setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, \"\")");
+    TransformerFactory tf = TransformerFactory.newInstance();
+    tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    parseAll(tf);
+  }
 
+  public static void testAccessExternalSchema() {
+    System.out.println("ACCESS_EXTERNAL_SCHEMA is n/a");
+  }
+
+  public static void testAccessExternalStylesheet() throws TransformerConfigurationException {
+    System.out.println("setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, \"\")");
+    TransformerFactory tf = TransformerFactory.newInstance();
+    tf.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+    parseAll(tf);
+  }
+
+  public static void testDisallowDoctypeDecl() {
+    System.out.println("setFeature(\"http://apache.org/xml/features/disallow-doctype-decl\", true)");
+    TransformerFactory tf = TransformerFactory.newInstance();
+    try {
+      tf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+      parseAll(tf);
+    } catch (TransformerConfigurationException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  public static void testExternalGeneralEntities() {
+    
+    System.out.println("setFeature(\"http://xml.org/sax/features/external-general-entities\", false)");
+    TransformerFactory tf = TransformerFactory.newInstance();
+    try {
+      tf.setFeature("http://xml.org/sax/features/external-general-entities", true);
+      parseAll(tf);
+    } catch (TransformerConfigurationException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  public static void testExternalParameterEntities() {
+    System.out.println("setFeature(\"http://xml.org/sax/features/external-parameter-entities\", false)");
+    TransformerFactory tf = TransformerFactory.newInstance();
+    try {
+      tf.setFeature("http://xml.org/sax/features/external-parameter-entities", true);
+      parseAll(tf);
+    } catch (TransformerConfigurationException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  public static void testSetValidating() {
+    System.out.println("setValidating(false) - n/a");
+  }
+
+  public static void testSetExpandEntities() {
+    System.out.println("setExpandEntityReferences(false) - n/a");
+  }
+
+  public static void testSetXIncludeAware() {
+    System.out.println("setXIncludeAware(false) - n/a");
+  }
+
+  public static void testXInclude() {
+    System.out.println("setFeature(\"http://apache.org/xml/features/xinclude\", false)");
+    TransformerFactory tf = TransformerFactory.newInstance();
+    try {
+      tf.setFeature("http://apache.org/xml/features/xinclude", false);
+      parseAll(tf);
+    } catch (TransformerConfigurationException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  public static void testLoadExternalDTD() {
+    System.out.println("setFeature(\"http://apache.org/xml/features/nonvalidating/load-external-dtd\", false)");
+    TransformerFactory tf = TransformerFactory.newInstance();
+    try {
+      tf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+      parseAll(tf);
+    } catch (TransformerConfigurationException e) {
+      System.out.println(e.getMessage());
+    }
+  }
+
+  /* Parsers */
 
   public static void parseAll(TransformerFactory tf) {
     parseXmlBomb(tf);
@@ -117,7 +214,7 @@ public class Tests {
     } catch (TransformerConfigurationException e) {
       if(e.getMessage().contains("Connection refused")){
         System.out.println("Insecure");
-      } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")){
+      } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction")){
         System.out.println("Secure");
       } else if(e.getMessage().contains("DOCTYPE is disallowed")){
         System.out.println("Secure");
