@@ -166,12 +166,12 @@ public class Tests {
         System.out.println("Secure");
     } catch (Exception e) {
       if (e.getMessage().contains("entity expansions in this document; this is the limit imposed by the JDK.")){
-          System.out.println("Insecure");
+          System.out.println("Insecure !");
       } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-          System.out.println("Secure");
+          System.out.println("Secure !");
       }else{
           System.out.println(e.getMessage());
-          System.out.println("Insecure");
+          System.out.println("Insecure !");
       }
     }
   }
@@ -193,11 +193,11 @@ public class Tests {
         System.out.println("Secure");
     } catch (Exception e) {
         if(e.getMessage().contains("Connection refused")){
-            System.out.println("Insecure");
+            System.out.println("Insecure !");
         } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")){
-            System.out.println("Secure");
+            System.out.println("Secure !");
         } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-            System.out.println("Secure");
+            System.out.println("Secure !");
         }else{
             System.out.println(e.getMessage());
         }
@@ -213,11 +213,11 @@ public class Tests {
       System.out.println("Secure");
     } catch (TransformerConfigurationException e) {
       if(e.getMessage().contains("Connection refused")){
-        System.out.println("Insecure");
+        System.out.println("Insecure !");
       } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction")){
-        System.out.println("Secure");
+        System.out.println("Secure !");
       } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-        System.out.println("Secure");
+        System.out.println("Secure !");
       } else {
         System.out.println(e.getMessage());
       }
@@ -241,11 +241,11 @@ public class Tests {
           System.out.println("Secure");
         } catch (Exception e){
             if(e.getMessage().contains("Connection refused")){
-                System.out.println("Insecure");
+                System.out.println("Insecure !");
             } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")){
-                System.out.println("Secure");
+                System.out.println("Secure !");
             } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-                System.out.println("Secure");
+                System.out.println("Secure !");
             }
             else {
                 System.out.println(e.getMessage());
