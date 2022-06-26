@@ -20,7 +20,7 @@ public class Tests {
 
 
         try {
-            System.out.println("TESTING SAXParserFactory configurations");
+            System.out.println("TESTING SAXBuilder configurations");
             testDefaultConfig();
             testConstructor1();
             testConstructor2();
