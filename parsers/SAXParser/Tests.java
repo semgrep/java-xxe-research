@@ -5,9 +5,10 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.*;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
@@ -34,6 +35,11 @@ public class Tests {
             testSetXIncludeAware();
             testSetFeatureXInclude();
             testSetFeatureLoadExternalDTD();
+
+            //SAXParser itself can set properties too
+            testSAXParserSetPropertyAccessExternalDTD();
+            testSAXParserSetPropertyAccessExternalSchema();
+            //testSAXParserSetPropertyAccessExternalStylesheet(); --> property not recognized
         } catch (Exception e) {
             System.out.println(e.getMessage());
             // do nothing
@@ -111,6 +117,29 @@ public class Tests {
         parseAllThree(saxParser);
     }
 
+    public static void testSAXParserSetPropertyAccessExternalDTD() throws ParserConfigurationException, SAXException {
+        System.out.println("SAXParser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, \"\");");
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser saxParser = factory.newSAXParser();
+        saxParser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        parseAllThree(saxParser);
+    }
+
+    public static void testSAXParserSetPropertyAccessExternalSchema() throws ParserConfigurationException, SAXException {
+        System.out.println("SAXParser.setProperty(ACCESS_EXTERNAL_SCHEMA, \"\");");
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser saxParser = factory.newSAXParser();
+        saxParser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        parseAllThree(saxParser);
+    }
+
+    public static void testSAXParserSetPropertyAccessExternalStylesheet() throws ParserConfigurationException, SAXException {
+        System.out.println("SAXParser.setProperty(ACCESS_EXTERNAL_STYLESHEET, \"\");");
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser saxParser = factory.newSAXParser();
+        saxParser.setProperty(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+        parseAllThree(saxParser);
+    }
 
     /*
         Parse the test files
@@ -127,10 +156,13 @@ public class Tests {
         try {
             File input = new File("payloads/input-dos/xml-bomb.xml");
             saxParser.parse(input, new DefaultHandler());
+            System.out.println("    Parse XML Bomb: Secure");
         } catch (Exception e) {
             if (e.getMessage().equals("JAXP00010001: The parser has encountered more than \"64000\" entity expansions in this document; this is the limit imposed by the JDK.")){
+                System.out.println("        Exception: " + e.getMessage());
                 System.out.println("    Parse XML Bomb: Insecure");
             } else if(e.getMessage().contains("DOCTYPE is disallowed")){
+                System.out.println("        Exception: " + e.getMessage());
                 System.out.println("    Parse XML Bomb: Secure");
             }else{
                 System.out.println(e.getMessage());
@@ -148,8 +180,10 @@ public class Tests {
             if(e.getMessage().contains("Connection refused")){
                 System.out.println("    Parse Input With Schema: Insecure");
             } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")){
+                System.out.println("        Exception: " + e.getMessage());
                 System.out.println("    Parse Input With Schema: Secure");
             } else if(e.getMessage().contains("DOCTYPE is disallowed")){
+                System.out.println("        Exception: " + e.getMessage());
                 System.out.println("    Parse Input With Schema: Secure");
             }else{
                 System.out.println(e.getMessage());
@@ -161,14 +195,16 @@ public class Tests {
         try {
             File input = new File("payloads/input-with-stylesheet/input.xml");
             saxParser.parse(input, new DefaultHandler());
-            System.out.println("    Parse Input With Schema: Secure");
+            System.out.println("    Parse Input With Stylesheet: Secure");
         } catch (Exception e) {
             if(e.getMessage().contains("Connection refused")){
-                System.out.println("    Parse Input With Schema: Insecure");
+                System.out.println("    Parse Input With Stylesheet: Insecure");
             } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")){
-                System.out.println("    Parse Input With Schema: Secure");
+                System.out.println("        Exception: " + e.getMessage());
+                System.out.println("    Parse Input With Stylesheet: Secure");
             } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-                System.out.println("    Parse Input With Schema: Secure");
+                System.out.println("        Exception: " + e.getMessage());
+                System.out.println("    Parse Input With Stylesheet: Secure");
             }else{
                 System.out.println(e.getMessage());
             }
@@ -177,17 +213,18 @@ public class Tests {
 
     public static void parseInputWithParameterEntity(SAXParser dBuilder){
         try {
-            System.out.print("    Parse Xml Input With Parameter Entity: ");
             File input = new File("payloads/input-with-parameter-entity/input.xml");
             dBuilder.parse(input, new DefaultHandler());
-            System.out.println("Secure");
+            System.out.println("    Parse Xml Input With Parameter Entity: Secure");
         } catch (Exception e){
             if(e.getMessage().contains("Connection refused")){
-                System.out.println("Insecure");
+                System.out.println("    Parse Xml Input With Parameter Entity: Insecure");
             } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")){
-                System.out.println("Secure");
+                System.out.println("        Exception: " + e.getMessage());
+                System.out.println("    Parse Xml Input With Parameter Entity: Secure");
             } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-                System.out.println("Secure");
+                System.out.println("        Exception: " + e.getMessage());
+                System.out.println("    Parse Xml Input With Parameter Entity: Secure");
             }
             else {
                 System.out.println(e.getMessage());

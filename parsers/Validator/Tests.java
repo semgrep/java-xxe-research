@@ -1,8 +1,6 @@
 package parsers.Validator;
 
-import java.io.File;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.TransformerConfigurationException;
@@ -10,8 +8,9 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 public class Tests {
   public static void main(String [] args) {
@@ -62,7 +61,7 @@ public class Tests {
   }
 
   public static void testAccessExternalDTD() throws SAXException {
-    System.out.println("setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, \"\")");
+    System.out.println("setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, \"\")");
     File xsdFile = new File("payloads/input-with-schema/ok-input-schema.xsd");
     SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     Schema schema = sf.newSchema(xsdFile);
@@ -72,7 +71,7 @@ public class Tests {
   }
 
   public static void testAccessExternalSchema() throws SAXException {
-    System.out.println("setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, \"\")");
+    System.out.println("setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, \"\")");
     File xsdFile = new File("payloads/input-with-schema/ok-input-schema.xsd");
     SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     Schema schema = sf.newSchema(xsdFile);
