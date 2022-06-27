@@ -24,6 +24,7 @@ public class Tests {
         try {
             System.out.println("TESTING SAXReader configurations");
             testDefaultConfig();
+            test0();
             test1();
             test2();
             //test3(); --> Not recognized
