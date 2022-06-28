@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<!-- Source: https://securitylab.github.com/research/restlet_xxe_vulnerability_CVE-2017-14949/#:~:text=XML%20parameter%20entities,used%20outside%20of%20the%20DTD. -->
-<!DOCTYPE root [<!ELEMENT foo ANY>
-        <!ENTITY % remote SYSTEM "http://localhost:8090" >
-        %remote;
-        %param1;
-        ]>
-<string>SomeText</string>

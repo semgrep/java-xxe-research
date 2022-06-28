@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<matricula>
+    <aluno>
+        <nome>Vasilii</nome>
+        <nascimento>08/02/1990</nascimento>
+        <numeroMatricula>0821005</numeroMatricula>
+    </aluno>
+    <cadeiras>
+        <cadeira>
+            <nome>Teoria dos Automatos</nome>
+           <horario>N24CD</horario>
+           <creditos>4</creditos>
+           <professor>Pedro Porfirio</professor>
+        </cadeira>
+        <cadeira>
+            <nome>Logica Matematica</nome>
+           <horario>N24AB</horario>
+           <creditos>4</creditos>
+           <professor>Rodrigo Siebra</professor>
+        </cadeira>
+        <cadeira>
+            <nome>Arquitetura de Computadores</nome>
+           <horario>T24EF</horario>
+           <creditos>4</creditos>
+           <professor>Marina</professor>
+        </cadeira>
+        <cadeira>
+            <nome>Engenharia de Software</nome>
+           <horario>M246AB</horario>
+           <creditos>6</creditos>
+           <professor>Oto Siebra</professor>
+        </cadeira>
+    </cadeiras>
+</matricula>
