@@ -14,11 +14,11 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 public class Tests {
-  public static void main(String [] args) {
+  public static void main(String[] args) {
     // ignore error messages
     System.setErr(new PrintStream(new OutputStream() {
-        public void write(int b) {
-        }
+      public void write(int b) {
+      }
     }));
 
     try {
@@ -37,8 +37,8 @@ public class Tests {
       testXInclude();
       testLoadExternalDTD();
     } catch (Exception e) {
-        System.out.println(e.getMessage());
-        // do nothing
+      System.out.println(e.getMessage());
+      // do nothing
     }
   }
 
@@ -144,112 +144,236 @@ public class Tests {
 
   public static void parseAll(TransformerFactory tf) {
     parseXmlBomb(tf);
-    parseInputWithSchema(tf);
-    parseInputWithStylesheet(tf);
-    parseInputWithParameterEntity(tf);
+    parseXmlDtd(tf);
+    parseXmlParameterEntity(tf);
+    parseSchemaDtd(tf);
+    parseSchemaImport(tf);
+    parseSchemaInclude(tf);
+    parseStylesheetDtd(tf);
+    parseStylesheetImport(tf);
+    parseStylesheetInclude(tf);
+    parseStylesheetDocument(tf);
   }
 
   public static void parseXmlBomb(TransformerFactory tf) {
     try {
-        System.out.print("    Parse XML Bomb: ");
-        File input = new File("payloads/input-dos/xml-bomb.xml");
-        File style = new File("payloads/input-with-stylesheet/ok-stylesheet.xsl");
-        File output = new File("payloads/input-with-stylesheet/output.csv");
+      File input = new File("payloads-new/xml-attacks/xml-bomb.xml");
+      File style = new File("payloads-new/ok-stylesheet.xsl");
+      File output = new File("payloads/input-with-stylesheet/output.csv");
 
-        StreamSource source = new StreamSource(input);
-        StreamSource xsltSource = new StreamSource(style);
-
-        Transformer transformer = tf.newTransformer(xsltSource);
-        
-        Result target = new StreamResult(output);
-        transformer.transform(source, target);
-        System.out.println("Secure");
-    } catch (Exception e) {
-      if (e.getMessage().contains("entity expansions in this document; this is the limit imposed by the JDK.")){
-          System.out.println("Insecure");
-      } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-          System.out.println("Secure");
-      }else{
-          System.out.println(e.getMessage());
-          System.out.println("Insecure");
-      }
-    }
-  }
-
-  public static void parseInputWithSchema(TransformerFactory tf) {
-    try {
-        System.out.print("    Parse Xml Input With Schema: ");
-        File input = new File("payloads/input-with-schema/input.xml");
-        File style = new File("payloads/input-with-stylesheet/ok-stylesheet.xsl");
-        File output = new File("payloads/input-with-stylesheet/output.csv");
-
-        StreamSource source = new StreamSource(input);
-        StreamSource xsltSource = new StreamSource(style);
-
-        Transformer transformer = tf.newTransformer(xsltSource);
-        
-        Result target = new StreamResult(output);
-        transformer.transform(source, target);
-        System.out.println("Secure");
-    } catch (Exception e) {
-        if(e.getMessage().contains("Connection refused")){
-            System.out.println("Insecure");
-        } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")){
-            System.out.println("Secure");
-        } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-            System.out.println("Secure");
-        }else{
-            System.out.println(e.getMessage());
-        }
-    }
-  }
-
-  public static void parseInputWithStylesheet(TransformerFactory tf) {
-    try {
-      System.out.print("    Parse Xml Input With Stylesheet: ");
-      File style = new File("payloads/input-with-stylesheet/stylesheet.xsl");
+      StreamSource source = new StreamSource(input);
       StreamSource xsltSource = new StreamSource(style);
-      tf.newTransformer(xsltSource);
-      System.out.println("Secure");
-    } catch (TransformerConfigurationException e) {
-      if(e.getMessage().contains("Connection refused")){
-        System.out.println("Insecure");
-      } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction")){
-        System.out.println("Secure");
-      } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-        System.out.println("Secure");
+
+      Transformer transformer = tf.newTransformer(xsltSource);
+
+      Result target = new StreamResult(output);
+      transformer.transform(source, target);
+
+      System.out.println("    Parse XML Bomb: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains(
+          "The parser has encountered more than \"64000\" entity expansions in this document; this is the limit imposed by the JDK")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Bomb: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Bomb: Secure");
       } else {
         System.out.println(e.getMessage());
       }
     }
   }
 
-    public static void parseInputWithParameterEntity(TransformerFactory tf){
-        try {
-          System.out.print("    Parse Xml Input With Parameter Entity: ");
-          File input = new File("payloads/input-with-stylesheet/input-parameter-entity.xml");
-          File style = new File("payloads/input-with-stylesheet/ok-stylesheet.xsl");
-          File output = new File("payloads/input-with-stylesheet/output.csv");
+  public static void parseXmlDtd(TransformerFactory tf) {
+    try {
+      File input = new File("payloads-new/xml-attacks/input-dtd.xml");
+      File style = new File("payloads-new/ok-stylesheet.xsl");
+      File output = new File("payloads/input-with-stylesheet/output.csv");
 
-          StreamSource source = new StreamSource(input);
-          StreamSource xsltSource = new StreamSource(style);
+      StreamSource source = new StreamSource(input);
+      StreamSource xsltSource = new StreamSource(style);
 
-          Transformer transformer = tf.newTransformer(xsltSource);
-          
-          Result target = new StreamResult(output);
-          transformer.transform(source, target);
-          System.out.println("Secure");
-        } catch (Exception e){
-            if(e.getMessage().contains("Connection refused")){
-                System.out.println("Insecure");
-            } else if(e.getMessage().contains("External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")){
-                System.out.println("Secure");
-            } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-                System.out.println("Secure");
-            }
-            else {
-                System.out.println(e.getMessage());
-            }
-        }
+      Transformer transformer = tf.newTransformer(xsltSource);
+
+      Result target = new StreamResult(output);
+      transformer.transform(source, target);
+      System.out.println("    Parse XML Dtd: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse XML Dtd: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Dtd: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Dtd: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
     }
+  }
+
+  public static void parseXmlParameterEntity(TransformerFactory tf) {
+    try {
+      File input = new File("payloads-new/xml-attacks/input-with-parameter-entity.xml");
+      File style = new File("payloads-new/ok-stylesheet.xsl");
+      File output = new File("payloads/input-with-stylesheet/output.csv");
+
+      StreamSource source = new StreamSource(input);
+      StreamSource xsltSource = new StreamSource(style);
+
+      Transformer transformer = tf.newTransformer(xsltSource);
+
+      Result target = new StreamResult(output);
+      transformer.transform(source, target);
+      System.out.println("    Parse XML Parameter Entity: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse XML Parameter Entity: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Parameter Entity: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Parameter Entity: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
+  public static void parseSchemaDtd(TransformerFactory tf) {
+    System.out.println("    Parse Schema Dtd: n/a");
+  }
+
+  public static void parseSchemaImport(TransformerFactory tf) {
+    System.out.println("    Parse Schema Import: n/a");
+  }
+
+  public static void parseSchemaInclude(TransformerFactory tf) {
+    System.out.println("    Parse Schema Include: n/a");
+  }
+
+  public static void parseStylesheetDtd(TransformerFactory tf) {
+    try {
+      File input = new File("payloads-new/ok-input.xml");
+      File style = new File("payloads-new/xsl-stylesheet-attacks/stylesheet-dtd.xsl");
+      File output = new File("payloads/input-with-stylesheet/output.csv");
+
+      StreamSource source = new StreamSource(input);
+      StreamSource xsltSource = new StreamSource(style);
+
+      Transformer transformer = tf.newTransformer(xsltSource);
+
+      Result target = new StreamResult(output);
+      transformer.transform(source, target);
+      System.out.println("    Parse Stylesheet Dtd: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse Stylesheet Dtd: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Stylesheet Dtd: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Stylesheet Dtd: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
+  public static void parseStylesheetDocument(TransformerFactory tf) {
+    try {
+      File input = new File("payloads-new/ok-input.xml");
+      File style = new File("payloads-new/xsl-stylesheet-attacks/stylesheet-document.xsl");
+      File output = new File("payloads/input-with-stylesheet/output.csv");
+
+      StreamSource source = new StreamSource(input);
+      StreamSource xsltSource = new StreamSource(style);
+
+      Transformer transformer = tf.newTransformer(xsltSource);
+
+      Result target = new StreamResult(output);
+      transformer.transform(source, target);
+      System.out.println("    Parse Stylesheet Document: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse Stylesheet Document: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Stylesheet Document: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Stylesheet Document: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
+  public static void parseStylesheetImport(TransformerFactory tf) {
+    try {
+      File input = new File("payloads-new/ok-input.xml");
+      File style = new File("payloads-new/xsl-stylesheet-attacks/stylesheet-import.xsl");
+      File output = new File("payloads/input-with-stylesheet/output.csv");
+
+      StreamSource source = new StreamSource(input);
+      StreamSource xsltSource = new StreamSource(style);
+
+      Transformer transformer = tf.newTransformer(xsltSource);
+
+      Result target = new StreamResult(output);
+      transformer.transform(source, target);
+      System.out.println("    Parse Stylesheet Import: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse Stylesheet Import: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Stylesheet Import: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Stylesheet Import: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
+  public static void parseStylesheetInclude(TransformerFactory tf) {
+    try {
+      File input = new File("payloads-new/ok-input.xml");
+      File style = new File("payloads-new/xsl-stylesheet-attacks/stylesheet-include.xsl");
+      File output = new File("payloads/input-with-stylesheet/output.csv");
+
+      StreamSource source = new StreamSource(input);
+      StreamSource xsltSource = new StreamSource(style);
+
+      Transformer transformer = tf.newTransformer(xsltSource);
+
+      Result target = new StreamResult(output);
+      transformer.transform(source, target);
+      System.out.println("    Parse Stylesheet Include: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse Stylesheet Include: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Stylesheet Include: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Stylesheet Include: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
 }

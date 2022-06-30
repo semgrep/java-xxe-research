@@ -15,11 +15,11 @@ import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
 public class Tests {
-  public static void main(String [] args) {
+  public static void main(String[] args) {
     // ignore error messages
     System.setErr(new PrintStream(new OutputStream() {
-        public void write(int b) {
-        }
+      public void write(int b) {
+      }
     }));
 
     try {
@@ -38,8 +38,8 @@ public class Tests {
       testXInclude();
       testLoadExternalDTD();
     } catch (Exception e) {
-        System.out.println(e.getMessage());
-        // do nothing
+      System.out.println(e.getMessage());
+      // do nothing
     }
   }
 
@@ -49,14 +49,16 @@ public class Tests {
     parseAll(sf);
   }
 
-  public static void testSetFeatureSecreProcessing() throws TransformerConfigurationException, SAXNotRecognizedException, SAXNotSupportedException {
+  public static void testSetFeatureSecreProcessing()
+      throws TransformerConfigurationException, SAXNotRecognizedException, SAXNotSupportedException {
     System.out.println("setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)");
     SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     sf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
     parseAll(sf);
   }
 
-  public static void testAccessExternalDTD() throws TransformerConfigurationException, SAXNotRecognizedException, SAXNotSupportedException {
+  public static void testAccessExternalDTD()
+      throws TransformerConfigurationException, SAXNotRecognizedException, SAXNotSupportedException {
     System.out.println("setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, \"\")");
     SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     sf.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
@@ -141,88 +143,189 @@ public class Tests {
     }
   }
 
-  /* Parsers */
+  /*
+   * Parse the test files
+   */
 
   public static void parseAll(SchemaFactory sf) {
     parseXmlBomb(sf);
-    parseInputWithSchema(sf);
-    parseInputWithStylesheet(sf);
-    parseInputWithParameterEntity(sf);
+    parseXmlDtd(sf);
+    parseXmlParameterEntity(sf);
+    parseSchemaDtd(sf);
+    parseSchemaImport(sf);
+    parseSchemaInclude(sf);
+    parseStylesheetDtd(sf);
+    parseStylesheetImport(sf);
+    parseStylesheetInclude(sf);
+    parseStylesheetDocument(sf);
   }
 
   public static void parseXmlBomb(SchemaFactory sf) {
     try {
-        System.out.print("    Parse XML Bomb: ");
-        File xmlFile = new File("payloads/input-dos/xml-bomb.xml");
-        File xsdFile = new File("payloads/input-with-schema/ok-input-schema.xsd");
 
-        Schema schema = sf.newSchema(xsdFile);
-        Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(xmlFile));
-
-        System.out.println("Secure");
-    } catch (Exception e) {
-      if (e.getMessage().contains("entity expansions in this document; this is the limit imposed by the JDK.")){
-          System.out.println("Insecure !");
-      } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-          System.out.println("Secure !");
-      }else{
-          System.out.println(e.getMessage());
-          System.out.println("Insecure !");
-      }
-    }
-  }
-
-  public static void parseInputWithSchema(SchemaFactory sf) {
-    try {
-        System.out.print("    Parse Xml Input With Schema: ");
-        File xmlFile = new File("payloads/input-with-schema/input.xml");
-        File xsdFile = new File("payloads/input-with-schema/input-schema.xsd");
-
-        Schema schema = sf.newSchema(xsdFile);
-        Validator validator = schema.newValidator();
-        validator.validate(new StreamSource(xmlFile));
-
-        System.out.println("Secure");
-    } catch (Exception e) {
-        if(e.getMessage().contains("Connection refused")){
-            System.out.println("Insecure !");
-        } else if(e.getMessage().contains("'http' access is not allowed")){
-            System.out.println("Secure !");
-        } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-            System.out.println("Secure !");
-        }else{
-            System.out.println(e.getMessage());
-        }
-    }
-  }
-
-  public static void parseInputWithStylesheet(SchemaFactory sf) {
-    System.out.print("    Parse Xml Input With Stylesheet: ");
-    System.out.println("n/a");
-  }
-
-  public static void parseInputWithParameterEntity(SchemaFactory sf){
-    try {
-      System.out.print("    Parse Xml Input With Parameter Entity: ");
-      File xmlFile = new File("payloads/input-with-stylesheet/input-parameter-entity.xml");
-      File xsdFile = new File("payloads/input-with-schema/input-schema.xsd");
+      File xmlFile = new File("payloads-new/xml-attacks/xml-bomb.xml");
+      File xsdFile = new File("payloads-new/ok-schema.xsd");
 
       Schema schema = sf.newSchema(xsdFile);
       Validator validator = schema.newValidator();
       validator.validate(new StreamSource(xmlFile));
-      System.out.println("Secure");
-    } catch (Exception e){
-        if(e.getMessage().contains("Connection refused")){
-            System.out.println("Insecure !");
-        } else if(e.getMessage().contains("'http' access is not allowed")){
-            System.out.println("Secure !");
-        } else if(e.getMessage().contains("DOCTYPE is disallowed")){
-            System.out.println("Secure !");
-        }
-        else {
-            System.out.println(e.getMessage());
-        }
+
+      System.out.println("    Parse XML Bomb: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains(
+          "The parser has encountered more than \"64000\" entity expansions in this document; this is the limit imposed by the JDK")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Bomb: Insecure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Bomb: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
     }
   }
+
+  public static void parseXmlDtd(SchemaFactory sf) {
+    try {
+      File xmlFile = new File("payloads-new/xml-attacks/input-dtd.xml");
+      File xsdFile = new File("payloads-new/ok-schema.xsd");
+
+      Schema schema = sf.newSchema(xsdFile);
+      Validator validator = schema.newValidator();
+      validator.validate(new StreamSource(xmlFile));
+
+      System.out.println("    Parse XML Dtd: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse XML Dtd: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Dtd: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Dtd: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
+  public static void parseXmlParameterEntity(SchemaFactory sf) {
+    try {
+      File xmlFile = new File("payloads-new/xml-attacks/input-with-parameter-entity.xml");
+      File xsdFile = new File("payloads-new/ok-schema.xsd");
+
+      Schema schema = sf.newSchema(xsdFile);
+      Validator validator = schema.newValidator();
+      validator.validate(new StreamSource(xmlFile));
+
+      System.out.println("    Parse XML Parameter Entity: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse XML Parameter Entity: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Parameter Entity: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse XML Parameter Entity: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
+  public static void parseSchemaDtd(SchemaFactory sf) {
+    try {
+      File xmlFile = new File("payloads-new/ok-input.xml");
+      File xsdFile = new File("payloads-new/xsd-schema-attacks/schema-dtd.xsd");
+
+      Schema schema = sf.newSchema(xsdFile);
+      Validator validator = schema.newValidator();
+      validator.validate(new StreamSource(xmlFile));
+      System.out.println("    Parse Schema Dtd: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse Schema Dtd: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Schema Dtd: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Schema Dtd: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
+  public static void parseSchemaImport(SchemaFactory sf) {
+    try {
+      File xmlFile = new File("payloads-new/ok-input.xml");
+      File xsdFile = new File("payloads-new/xsd-schema-attacks/schema-import.xsd");
+
+      Schema schema = sf.newSchema(xsdFile);
+      Validator validator = schema.newValidator();
+      validator.validate(new StreamSource(xmlFile));
+      System.out.println("    Parse Schema Import: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse Schema Import: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Schema Import: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Schema Import: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
+  public static void parseSchemaInclude(SchemaFactory sf) {
+    try {
+      File xmlFile = new File("payloads-new/ok-input.xml");
+      File xsdFile = new File("payloads-new/xsd-schema-attacks/schema-include.xsd");
+
+      Schema schema = sf.newSchema(xsdFile);
+      Validator validator = schema.newValidator();
+      validator.validate(new StreamSource(xmlFile));
+      System.out.println("    Parse Schema Include: Secure");
+    } catch (Exception e) {
+      if (e.getMessage().contains("Connection refused")) {
+        System.out.println("    Parse Schema Include: Insecure");
+      } else if (e.getMessage().contains(
+          "External Entity: Failed to read external document 'localhost:8090', because 'http' access is not allowed due to restriction set by the accessExternalDTD property.")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Schema Include: Secure");
+      } else if (e.getMessage().contains("DOCTYPE is disallowed")) {
+        System.out.println("        Exception: " + e.getMessage());
+        System.out.println("    Parse Schema Include: Secure");
+      } else {
+        System.out.println(e.getMessage());
+      }
+    }
+  }
+
+  public static void parseStylesheetDtd(SchemaFactory sf) {
+    System.out.println("    Parse Stylesheet Dtd: n/a");
+  }
+
+  public static void parseStylesheetDocument(SchemaFactory sf) {
+    System.out.println("    Parse Stylesheet Document: n/a");
+  }
+
+  public static void parseStylesheetImport(SchemaFactory sf) {
+    System.out.println("    Parse Stylesheet Import: n/a");
+  }
+
+  public static void parseStylesheetInclude(SchemaFactory sf) {
+    System.out.println("    Parse Stylesheet Include: n/a");
+  }
+
 }
