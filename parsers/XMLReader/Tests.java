@@ -1,18 +1,12 @@
 package parsers.XMLReader;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
+import java.io.*;
 // import org.xml.sax.helpers.XMLReaderFactory;
 
 public class Tests {
@@ -38,6 +32,8 @@ public class Tests {
       testSetXIncludeAware();
       testXInclude();
       testLoadExternalDTD();
+      testDefaultContentHandler();
+      testCustomContentHandler();
     } catch (Exception e) {
         System.out.println(e.getMessage());
         // do nothing
@@ -118,6 +114,89 @@ public class Tests {
       System.out.println(e.getMessage());
     }
   }
+
+  public static void testDefaultContentHandler(){
+      System.out.println("setContentHandler(new DefaultHandler)");
+      try {
+          // XMLReader reader = XMLReaderFactory.createXMLReader();
+          XMLReader reader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
+          reader.setContentHandler(new DefaultHandler());
+          parseAll(reader);
+      } catch (Exception e) {
+          System.out.println(e.getMessage());
+      }
+
+  }
+
+  public static void testCustomContentHandler(){
+      System.out.println("setContentHandler(Custom DefaultHandler)");
+      try {
+          // XMLReader reader = XMLReaderFactory.createXMLReader();
+          XMLReader reader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
+          reader.setContentHandler(new ContentHandler() {
+              @Override
+              public void setDocumentLocator(Locator locator) {
+                  //System.out.println(locator);
+              }
+
+              @Override
+              public void startDocument() throws SAXException {
+              }
+
+              @Override
+              public void endDocument() throws SAXException {
+              }
+
+              @Override
+              public void startPrefixMapping(String prefix, String uri) throws SAXException {
+                  //System.out.println(prefix);
+              }
+
+              @Override
+              public void endPrefixMapping(String prefix) throws SAXException {
+              }
+
+              @Override
+              public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+                  // whitelisting here?
+                  //System.out.println("startElement uri " + uri + "\n localName "+localName + "\n qName "+qName);
+              }
+
+              @Override
+              public void endElement(String uri, String localName, String qName) throws SAXException {
+              }
+
+              @Override
+              public void characters(char[] ch, int start, int length) throws SAXException {
+                  String s = "";
+                  for ( char c: ch
+                       ) {
+                      s += c;
+                  }
+                  //System.out.println("characters " + s);
+              }
+
+              @Override
+              public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+              }
+
+              @Override
+              public void processingInstruction(String target, String data) throws SAXException {
+                  //System.out.println("processing instruction "+ target + ", " + data);
+              }
+
+              @Override
+              public void skippedEntity(String name) throws SAXException {
+                  //System.out.println("skipped entity "+name);
+              }
+          });
+          parseAll(reader);
+      } catch (Exception e) {
+          System.out.println(e.getMessage());
+      }
+  }
+
+
 
   public static void testSetValidating() {
     System.out.println("setValidating(false) - n/a");
